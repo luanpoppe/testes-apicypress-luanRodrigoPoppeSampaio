@@ -1,7 +1,7 @@
 describe('Validação de consultas de usuários comuns', () => {
   let id
   let token
-  let email = "luanpoppe12@gmail.com"
+  let email = "luanpoppe13@gmail.com"
   let name = "Luan"
   let password = "senha123"
 
@@ -28,22 +28,15 @@ describe('Validação de consultas de usuários comuns', () => {
 
   after(() => {
     // Processo para apagar o usuário ao fim dos testes
-    cy.log("Tornar usuário criado admin")
+
+    cy.log("Deletar o usuário criado")
     cy.request({
-      method: 'PATCH',
-      url: 'https://raromdb-3c39614e42d4.herokuapp.com/api/users/admin/',
+      method: 'DELETE',
+      url: 'https://raromdb-3c39614e42d4.herokuapp.com/api/users/' + id,
       headers: {
         Authorization: "Bearer " + token
       }
-    }).then(() => {
-      cy.log("Deletar o usuário criado")
-      cy.request({
-        method: 'DELETE',
-        url: 'https://raromdb-3c39614e42d4.herokuapp.com/api/users/' + id,
-        headers: {
-          Authorization: "Bearer " + token
-        }
-      })
+
     })
 
   })
@@ -86,7 +79,7 @@ describe('Validação de consultas de usuários comuns', () => {
     })
   })
 
-  it("Permitir que usuário do tipo comum tenha permissão de atualizar suas próprias informações", () => {
+  it("Permitir que usuário do tipo comum atualize suas próprias informações", () => {
     cy.request({
       method: "PUT",
       url: "https://raromdb-3c39614e42d4.herokuapp.com/api/users/" + (id),
@@ -103,7 +96,7 @@ describe('Validação de consultas de usuários comuns', () => {
     })
   })
 
-  it("Não permitir que usuário do tipo comum tenha permissão de atualizar informações de outros usuários", () => {
+  it("Não permitir que usuário do tipo comum atualize informações de outros usuários", () => {
     cy.request({
       method: "PUT",
       url: "https://raromdb-3c39614e42d4.herokuapp.com/api/users/" + (id - 1),
@@ -121,9 +114,22 @@ describe('Validação de consultas de usuários comuns', () => {
     })
   })
 
-})
+  // it("Permitir que um usuário possa inativar sua própria conta", () => {
+  //   cy.request("PATCH", "api/users/inactivate").then((resposta) => {
 
+  //   })
+  // })
 
-it('descricao_do_teste', () => {
+  it("Permitir que usuário comum se torne admin sem passar por critérios especiais", () => {
+    cy.request({
+      method: 'PATCH',
+      url: 'https://raromdb-3c39614e42d4.herokuapp.com/api/users/admin/',
+      headers: {
+        Authorization: "Bearer " + token
+      }
+    }).then((resposta) => {
+      expect(resposta.status).to.equal(204)
+    })
+  })
 
 })
