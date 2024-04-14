@@ -1,7 +1,7 @@
 describe('Validação de cadastro de usuários', () => {
   let id
   let token
-  let email = "luanpoppe12@gmail.com"
+  let email = "luanpoppe13@gmail.com"
   let name = "Luan"
   let password = "senha123"
 
