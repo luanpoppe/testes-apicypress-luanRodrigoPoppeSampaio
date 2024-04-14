@@ -1,4 +1,4 @@
-describe('Validação de cadastro de usuários', () => {
+describe('Validação de consultas de usuários comuns', () => {
   let id
   let token
   let email = "luanpoppe12@gmail.com"
@@ -58,7 +58,7 @@ describe('Validação de cadastro de usuários', () => {
     })
   })
 
-  it("Não permitir que usuário não admin tenha permissão de ver informações de todos os usuário", () => {
+  it("Não permitir que usuário do tipo comum tenha permissão de ver informações de todos os usuário", () => {
     cy.request({
       method: "GET",
       url: "https://raromdb-3c39614e42d4.herokuapp.com/api/users/",
@@ -72,7 +72,7 @@ describe('Validação de cadastro de usuários', () => {
     })
   })
 
-  it("Não permitir que usuário não admin tenha permissão de deletar um usuário", () => {
+  it("Não permitir que usuário do tipo comum tenha permissão de deletar um usuário", () => {
     cy.request({
       method: "DELETE",
       url: "https://raromdb-3c39614e42d4.herokuapp.com/api/users/" + id,
@@ -86,7 +86,7 @@ describe('Validação de cadastro de usuários', () => {
     })
   })
 
-  it("Permitir que usuário não admin tenha permissão de atualizar suas próprias informações", () => {
+  it("Permitir que usuário do tipo comum tenha permissão de atualizar suas próprias informações", () => {
     cy.request({
       method: "PUT",
       url: "https://raromdb-3c39614e42d4.herokuapp.com/api/users/" + (id),
@@ -103,7 +103,7 @@ describe('Validação de cadastro de usuários', () => {
     })
   })
 
-  it("Não permitir que usuário não admin tenha permissão de atualizar informações de outros usuários", () => {
+  it("Não permitir que usuário do tipo comum tenha permissão de atualizar informações de outros usuários", () => {
     cy.request({
       method: "PUT",
       url: "https://raromdb-3c39614e42d4.herokuapp.com/api/users/" + (id - 1),
