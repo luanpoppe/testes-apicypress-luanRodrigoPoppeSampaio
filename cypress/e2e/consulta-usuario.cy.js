@@ -48,7 +48,7 @@ describe('Validação de cadastro de usuários', () => {
 
   })
 
-  it("Consultar informações do usuário criadocriado", () => {
+  it("Consultar informações do usuário criado", () => {
     cy.request({
       method: "GET",
       url: "https://raromdb-3c39614e42d4.herokuapp.com/api/users/" + id,
@@ -86,6 +86,23 @@ describe('Validação de cadastro de usuários', () => {
     })
   })
 
+  it("Permitir que usuário não admin tenha permissão de atualizar suas próprias informações", () => {
+    cy.request({
+      method: "PUT",
+      url: "https://raromdb-3c39614e42d4.herokuapp.com/api/users/" + (id),
+      headers: {
+        Authorization: "Bearer " + token
+      },
+      body: {
+        name: "novoNome",
+        password: "novoPassword"
+      },
+    }).then((resposta) => {
+      expect(resposta.status).to.equal(200)
+      expect(resposta.body.name).to.equal("novoNome")
+    })
+  })
+
   it("Não permitir que usuário não admin tenha permissão de atualizar informações de outros usuários", () => {
     cy.request({
       method: "PUT",
@@ -103,24 +120,7 @@ describe('Validação de cadastro de usuários', () => {
       expect(resposta.body.message).to.equal("Forbidden")
     })
   })
-  it("Permitir que usuário não admin tenha permissão de atualizar suas próprias informações", () => {
-    cy.request({
-      method: "PUT",
-      url: "https://raromdb-3c39614e42d4.herokuapp.com/api/users/" + (id),
-      headers: {
-        Authorization: "Bearer " + token
-      },
-      body: {
-        name: "novoNome",
-        password: "novoPassword"
-      },
-      failOnStatusCode: false
-    }).then((resposta) => {
-      expect(resposta.status).to.equal(200)
-      expect(resposta.body.name).to.equal("novoNome")
-      expect(resposta.body.password).to.equal("novoPassword")
-    })
-  })
+
 })
 
 

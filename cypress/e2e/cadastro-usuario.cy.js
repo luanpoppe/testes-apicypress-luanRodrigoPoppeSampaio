@@ -45,7 +45,7 @@ describe('Validação de cadastro de usuários', () => {
       expect(resposta.body.email).to.equal(email)
       expect(resposta.body.id).to.be.a("number")
       expect(resposta.body).to.have.property("active")
-      expect(resposta.body).to.have.property("type")
+      expect(resposta.body.type).to.equal(0)
       id = resposta.body.id
     })
   })
@@ -183,6 +183,7 @@ describe('Validação de cadastro de usuários', () => {
       ])
     })
   })
+
   it("Não permitir criar uma conta com um senha maior do que 12 caracteres", () => {
     cy.request({
       method: 'POST',
