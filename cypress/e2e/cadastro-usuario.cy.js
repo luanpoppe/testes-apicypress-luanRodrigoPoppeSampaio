@@ -54,9 +54,6 @@ describe('Validação de cadastro de usuários', () => {
     cy.request({
       method: 'POST',
       url: 'https://raromdb-3c39614e42d4.herokuapp.com/api/users/',
-      headers: {
-        Authorization: "Bearer " + token
-      },
       body: {
         name: name,
         email: email,
@@ -77,9 +74,6 @@ describe('Validação de cadastro de usuários', () => {
     cy.request({
       method: 'POST',
       url: 'https://raromdb-3c39614e42d4.herokuapp.com/api/users/',
-      headers: {
-        Authorization: "Bearer " + token
-      },
       body: {
         name: null,
         email: email,
@@ -100,9 +94,6 @@ describe('Validação de cadastro de usuários', () => {
     cy.request({
       method: 'POST',
       url: 'https://raromdb-3c39614e42d4.herokuapp.com/api/users/',
-      headers: {
-        Authorization: "Bearer " + token
-      },
       body: {
         name: name,
         email: null,
@@ -123,9 +114,6 @@ describe('Validação de cadastro de usuários', () => {
     cy.request({
       method: 'POST',
       url: 'https://raromdb-3c39614e42d4.herokuapp.com/api/users/',
-      headers: {
-        Authorization: "Bearer " + token
-      },
       body: {
         name: name,
         email: "emailNaoValido",
@@ -144,9 +132,6 @@ describe('Validação de cadastro de usuários', () => {
     cy.request({
       method: 'POST',
       url: 'https://raromdb-3c39614e42d4.herokuapp.com/api/users/',
-      headers: {
-        Authorization: "Bearer " + token
-      },
       body: {
         name: name,
         email: email,
@@ -167,9 +152,6 @@ describe('Validação de cadastro de usuários', () => {
     cy.request({
       method: 'POST',
       url: 'https://raromdb-3c39614e42d4.herokuapp.com/api/users/',
-      headers: {
-        Authorization: "Bearer " + token
-      },
       body: {
         name: name,
         email: email,
@@ -188,9 +170,6 @@ describe('Validação de cadastro de usuários', () => {
     cy.request({
       method: 'POST',
       url: 'https://raromdb-3c39614e42d4.herokuapp.com/api/users/',
-      headers: {
-        Authorization: "Bearer " + token
-      },
       body: {
         name: name,
         email: email,
