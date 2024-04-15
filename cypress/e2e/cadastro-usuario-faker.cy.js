@@ -7,7 +7,6 @@ function createRandomUser() {
     password: faker.internet.password(9)
   }
 }
-
 const userCreated = createRandomUser()
 
 describe('Validação de cadastro de usuários', () => {
@@ -27,6 +26,7 @@ describe('Validação de cadastro de usuários', () => {
       id = resposta.body.id
     })
   })
+
   it("Não permitir criar uma conta com um email já existente", () => {
     cy.request({
       method: 'POST',
@@ -70,49 +70,46 @@ describe('Validação de cadastro de usuários', () => {
     })
   })
 
-  // it("Não permitir criar uma conta sem passar um valor de email", () => {
-  //   cy.request({
-  //     method: 'POST',
-  //     url: 'https://raromdb-3c39614e42d4.herokuapp.com/api/users/',
-  //     headers: {
-  //       Authorization: "Bearer " + token
-  //     },
-  //     body: {
-  //       name: name,
-  //       email: null,
-  //       password: password
-  //     },
-  //     failOnStatusCode: false
-  //   }).then((resposta) => {
-  //     expect(resposta.status).to.equal(400)
-  //     expect(resposta.body.message).to.deep.equal([
-  //       "email must be longer than or equal to 1 characters",
-  //       "email must be an email",
-  //       "email should not be empty"
-  //     ])
-  //   })
-  // })
+  it("Não permitir criar uma conta sem passar um valor de email", () => {
+    cy.request({
+      method: 'POST',
+      url: 'https://raromdb-3c39614e42d4.herokuapp.com/api/users/',
+      body: {
+        name: userCreated.name,
+        email: null,
+        password: userCreated.password
+      },
+      failOnStatusCode: false
+    }).then((resposta) => {
+      expect(resposta.status).to.equal(400)
+      expect(resposta.body.message).to.deep.equal([
+        "email must be longer than or equal to 1 characters",
+        "email must be an email",
+        "email should not be empty"
+      ])
+    })
+  })
 
-  // it("Não permitir criar uma conta sem passar um valor de email válido", () => {
-  //   cy.request({
-  //     method: 'POST',
-  //     url: 'https://raromdb-3c39614e42d4.herokuapp.com/api/users/',
-  //     headers: {
-  //       Authorization: "Bearer " + token
-  //     },
-  //     body: {
-  //       name: name,
-  //       email: "emailNaoValido",
-  //       password: password
-  //     },
-  //     failOnStatusCode: false
-  //   }).then((resposta) => {
-  //     expect(resposta.status).to.equal(400)
-  //     expect(resposta.body.message).to.deep.equal([
-  //       "email must be an email"
-  //     ])
-  //   })
-  // })
+  it("Não permitir criar uma conta sem passar um valor de email válido", () => {
+    cy.request({
+      method: 'POST',
+      url: 'https://raromdb-3c39614e42d4.herokuapp.com/api/users/',
+      headers: {
+        Authorization: "Bearer " + token
+      },
+      body: {
+        name: userCreated.name,
+        email: "emailNaoValido",
+        password: userCreated.password
+      },
+      failOnStatusCode: false
+    }).then((resposta) => {
+      expect(resposta.status).to.equal(400)
+      expect(resposta.body.message).to.deep.equal([
+        "email must be an email"
+      ])
+    })
+  })
 
   // it("Não permitir criar uma conta sem passar um valor de senha", () => {
   //   cy.request({
