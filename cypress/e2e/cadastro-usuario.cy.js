@@ -1,9 +1,17 @@
 describe('Validação de cadastro de usuários', () => {
   let id
   let token
-  let email = "luanpoppe13@gmail.com"
-  let name = "Luan"
-  let password = "senha123"
+  let email
+  let name
+  let password
+
+  before(() => {
+    cy.fixture("newUser.json").then((user) => {
+      email = user.email
+      name = user.name
+      password = user.password
+    })
+  })
 
   after(() => {
     // Processo para apagar o usuário depois de ser cadastrado

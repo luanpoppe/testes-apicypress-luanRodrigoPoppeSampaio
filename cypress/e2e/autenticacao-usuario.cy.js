@@ -30,13 +30,6 @@ describe('Validação de cadastro de usuários', () => {
 
       cy.tornarAdminEDeletar(id, token)
     })
-
-    // cy.request("POST", "/api/auth/login", {
-    //   email: email,
-    //   password: password
-    // }).then((resposta) => {
-    //   token = resposta.body.accessToken
-    // })
   })
 
   it("Não é possível logar com um email não existente", () => {

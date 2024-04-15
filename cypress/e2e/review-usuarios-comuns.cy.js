@@ -1,27 +1,33 @@
 describe('Validação de consultas de usuários comuns', () => {
   let id
   let token
-  let email = "luanpoppe13@gmail.com"
-  let name = "Luan"
-  let password = "senha123"
+  let email
+  let name
+  let password
 
   before(() => {
     // Processo para criar e logar com um usuário antes dos testes
-    cy.log("Criar um usuário")
-    cy.request("POST", '/api/users', {
-      name: name,
-      email: email,
-      password: password
-    }).then((resposta) => {
-      id = resposta.body.id
-      email = resposta.body.email
-      name = resposta.body.name
-      cy.log("Logar com usuário criado")
-      cy.request("POST", "/api/auth/login", {
+    cy.fixture("newUser.json").then((user) => {
+      email = user.email
+      name = user.name
+      password = user.password
+    }).then(() => {
+      cy.log("Criar um usuário")
+      cy.request("POST", '/api/users', {
+        name: name,
         email: email,
-        password: "senha123"
+        password: password
       }).then((resposta) => {
-        token = resposta.body.accessToken
+        id = resposta.body.id
+        email = resposta.body.email
+        name = resposta.body.name
+        cy.log("Logar com usuário criado")
+        cy.request("POST", "/api/auth/login", {
+          email: email,
+          password: "senha123"
+        }).then((resposta) => {
+          token = resposta.body.accessToken
+        })
       })
     })
   })
