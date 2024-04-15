@@ -1,49 +1,42 @@
 describe('Validação de cadastro de usuários', () => {
   let id
   let token
-  let email = "luanpoppe13@gmail.com"
-  let name = "Luan"
-  let password = "senha123"
+  let email
+  let name
+  let password
 
   before(() => {
-    // Processo para criar um usuário antes dos testes
-    cy.log("Criar um usuário")
-    cy.request("POST", '/api/users', {
-      name: name,
-      email: email,
-      password: password
-    }).then((resposta) => {
-      id = resposta.body.id
-      email = resposta.body.email
-      name = resposta.body.name
+    cy.fixture("newUser.json").then((user) => {
+      email = user.email
+      name = user.name
+      password = user.password
+    }).then(() => {
+      // Processo para criar um usuário antes dos testes
+      cy.log("Criar um usuário")
+
+      cy.criarUsuario(name, email, password).then((resposta) => {
+        id = resposta
+      })
     })
   })
+
 
   after(() => {
     // Processo para apagar o usuário depois de ser cadastrado
     cy.log("Processo de apagar o usuário criado: ")
-    cy.request("POST", "/api/auth/login", {
-      email: email,
-      password: password
-    }).then((resposta) => {
-      token = resposta.body.accessToken
 
-      cy.request({
-        method: 'PATCH',
-        url: 'https://raromdb-3c39614e42d4.herokuapp.com/api/users/admin/',
-        headers: {
-          Authorization: "Bearer " + token
-        }
-      }).then(() => {
-        cy.request({
-          method: 'DELETE',
-          url: 'https://raromdb-3c39614e42d4.herokuapp.com/api/users/' + id,
-          headers: {
-            Authorization: "Bearer " + token
-          }
-        })
-      })
+    cy.logar(email, password).then((resposta) => {
+      token = resposta
+
+      cy.tornarAdminEDeletar(id, token)
     })
+
+    // cy.request("POST", "/api/auth/login", {
+    //   email: email,
+    //   password: password
+    // }).then((resposta) => {
+    //   token = resposta.body.accessToken
+    // })
   })
 
   it("Não é possível logar com um email não existente", () => {
