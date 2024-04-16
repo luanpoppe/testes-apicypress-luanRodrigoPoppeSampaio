@@ -24,16 +24,16 @@ describe('Validação de cadastro de usuários', () => {
 
       cy.request({
         method: 'PATCH',
-        url: 'https://raromdb-3c39614e42d4.herokuapp.com/api/users/admin/',
-        headers: {
-          Authorization: "Bearer " + token
+        url: '/api/users/admin/',
+        auth: {
+          bearer: token
         }
       }).then(() => {
         cy.request({
           method: 'DELETE',
-          url: 'https://raromdb-3c39614e42d4.herokuapp.com/api/users/' + id,
-          headers: {
-            Authorization: "Bearer " + token
+          url: '/api/users/' + id,
+          auth: {
+            bearer: token
           }
         })
       })
@@ -46,14 +46,17 @@ describe('Validação de cadastro de usuários', () => {
       email: email,
       password: password
     }).then((resposta) => {
-      cy.log(resposta)
-      expect(resposta.status).to.equal(201)
-      expect(resposta.isOkStatusCode).to.equal(true)
-      expect(resposta.body.name).to.equal(name)
-      expect(resposta.body.email).to.equal(email)
+      expect(resposta).to.deep.include({
+        status: 201,
+        isOkStatusCode: true,
+      })
+      expect(resposta.body).to.deep.include({
+        name: name,
+        email: email,
+        type: 0
+      })
       expect(resposta.body.id).to.be.a("number")
       expect(resposta.body).to.have.property("active")
-      expect(resposta.body.type).to.equal(0)
       id = resposta.body.id
     })
   })
@@ -61,7 +64,7 @@ describe('Validação de cadastro de usuários', () => {
   it("Não permitir criar uma conta com um email já existente", () => {
     cy.request({
       method: 'POST',
-      url: 'https://raromdb-3c39614e42d4.herokuapp.com/api/users/',
+      url: '/api/users/',
       body: {
         name: name,
         email: email,
@@ -81,7 +84,7 @@ describe('Validação de cadastro de usuários', () => {
   it("Não permitir criar uma conta sem passar um valor de usuario", () => {
     cy.request({
       method: 'POST',
-      url: 'https://raromdb-3c39614e42d4.herokuapp.com/api/users/',
+      url: '/api/users/',
       body: {
         name: null,
         email: email,
@@ -101,7 +104,7 @@ describe('Validação de cadastro de usuários', () => {
   it("Não permitir criar uma conta sem passar um valor de email", () => {
     cy.request({
       method: 'POST',
-      url: 'https://raromdb-3c39614e42d4.herokuapp.com/api/users/',
+      url: '/api/users/',
       body: {
         name: name,
         email: null,
@@ -121,7 +124,7 @@ describe('Validação de cadastro de usuários', () => {
   it("Não permitir criar uma conta sem passar um valor de email válido", () => {
     cy.request({
       method: 'POST',
-      url: 'https://raromdb-3c39614e42d4.herokuapp.com/api/users/',
+      url: '/api/users/',
       body: {
         name: name,
         email: "emailNaoValido",
@@ -139,7 +142,7 @@ describe('Validação de cadastro de usuários', () => {
   it("Não permitir criar uma conta sem passar um valor de senha", () => {
     cy.request({
       method: 'POST',
-      url: 'https://raromdb-3c39614e42d4.herokuapp.com/api/users/',
+      url: '/api/users/',
       body: {
         name: name,
         email: email,
@@ -159,7 +162,7 @@ describe('Validação de cadastro de usuários', () => {
   it("Não permitir criar uma conta com um senha menor do que 6 caracteres", () => {
     cy.request({
       method: 'POST',
-      url: 'https://raromdb-3c39614e42d4.herokuapp.com/api/users/',
+      url: '/api/users/',
       body: {
         name: name,
         email: email,
@@ -177,7 +180,7 @@ describe('Validação de cadastro de usuários', () => {
   it("Não permitir criar uma conta com um senha maior do que 12 caracteres", () => {
     cy.request({
       method: 'POST',
-      url: 'https://raromdb-3c39614e42d4.herokuapp.com/api/users/',
+      url: '/api/users/',
       body: {
         name: name,
         email: email,
@@ -188,6 +191,48 @@ describe('Validação de cadastro de usuários', () => {
       expect(resposta.status).to.equal(400)
       expect(resposta.body.message).to.deep.equal([
         "password must be shorter than or equal to 12 characters"
+      ])
+    })
+  })
+
+  it("Não permitir criar uma conta passando números no campo de 'name'", () => {
+    cy.request({
+      method: 'POST',
+      url: '/api/users/',
+      body: {
+        name: 123456789,
+        email: email,
+        password: password
+      },
+      failOnStatusCode: false
+    }).then((resposta) => {
+      expect(resposta.status).to.equal(400)
+      expect(resposta.body.message).to.deep.equal([
+        "name must be longer than or equal to 1 and shorter than or equal to 100 characters",
+        "name must be a string"
+      ])
+    })
+  })
+
+  it("Não permitir criar uma conta com um 'name' de mais de 100 caracteres", () => {
+    let nameInvalido = ""
+    for (let i = 0; i < 110; i++) {
+      nameInvalido += "a"
+
+    }
+    cy.request({
+      method: 'POST',
+      url: '/api/users/',
+      body: {
+        name: nameInvalido,
+        email: email,
+        password: password
+      },
+      failOnStatusCode: false
+    }).then((resposta) => {
+      expect(resposta.status).to.equal(400)
+      expect(resposta.body.message).to.deep.equal([
+        "name must be shorter than or equal to 100 characters"
       ])
     })
   })
