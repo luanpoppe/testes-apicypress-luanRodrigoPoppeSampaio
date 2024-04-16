@@ -4,6 +4,7 @@ describe('Validação de consultas de usuários comuns', () => {
   let email
   let name
   let password
+  const movieId = 4
 
   before(() => {
     // Processo para criar e logar com um usuário antes dos testes
@@ -13,20 +14,11 @@ describe('Validação de consultas de usuários comuns', () => {
       password = user.password
     }).then(() => {
       cy.log("Criar um usuário")
-      cy.request("POST", '/api/users', {
-        name: name,
-        email: email,
-        password: password
-      }).then((resposta) => {
-        id = resposta.body.id
-        email = resposta.body.email
-        name = resposta.body.name
-        cy.log("Logar com usuário criado")
-        cy.request("POST", "/api/auth/login", {
-          email: email,
-          password: "senha123"
-        }).then((resposta) => {
-          token = resposta.body.accessToken
+      cy.criarUsuario(name, email, password).then((idRecebido) => {
+        id = idRecebido
+
+        cy.logar(email, password).then((tokenRecebido) => {
+          token = tokenRecebido
         })
       })
     })
@@ -34,34 +26,20 @@ describe('Validação de consultas de usuários comuns', () => {
 
   after(() => {
     // Processo para apagar o usuário ao fim dos testes
-    cy.log("Tornar o usuário admin")
-    cy.request({
-      method: 'PATCH',
-      url: 'https://raromdb-3c39614e42d4.herokuapp.com/api/users/admin/',
-      headers: {
-        Authorization: "Bearer " + token
-      }
-    }).then((resposta) => {
-      cy.log("Deletar o usuário criado")
-      cy.request({
-        method: 'DELETE',
-        url: 'https://raromdb-3c39614e42d4.herokuapp.com/api/users/' + id,
-        headers: {
-          Authorization: "Bearer " + token
-        }
-      })
-    })
+    cy.log("Tornar o usuário admin e deletar o usuário")
+    cy.tornarAdminEDeletar(id, token)
   })
 
   it('Usuário do tipo comum pode criar uma review sobre um filme', () => {
+    cy.log(id)
     cy.request({
       method: 'POST',
-      url: 'https://raromdb-3c39614e42d4.herokuapp.com/api/users/review',
-      headers: {
-        Authorization: "Bearer " + token
+      url: '/api/users/review',
+      auth: {
+        bearer: token
       },
       body: {
-        movieId: 1,
+        movieId: movieId,
         score: 5,
         reviewText: "Texto da review do filme"
       }
@@ -71,10 +49,11 @@ describe('Validação de consultas de usuários comuns', () => {
   })
 
   it('Checar que a review criada existe', () => {
-    cy.request("/api/movies/1").then((resposta) => {
+    cy.request("/api/movies/" + movieId).then((resposta) => {
       const userReviews = resposta.body.reviews.filter((filme) => {
         return filme.user.id = id
       })
+      cy.log(userReviews)
       expect(userReviews).to.have.length(1)
       expect(userReviews[0].reviewText).to.equal("Texto da review do filme")
       expect(userReviews[0].score).to.equal(5)
@@ -84,17 +63,17 @@ describe('Validação de consultas de usuários comuns', () => {
   it('Checar que ao escrever nova review, irá atualiza o valor da review antiga', () => {
     cy.request({
       method: 'POST',
-      url: 'https://raromdb-3c39614e42d4.herokuapp.com/api/users/review',
-      headers: {
-        Authorization: "Bearer " + token
+      url: '/api/users/review',
+      auth: {
+        bearer: token
       },
       body: {
-        movieId: 1,
+        movieId: movieId,
         score: 1,
         reviewText: "Texto da NOVA review do filme"
       }
     }).then(() => {
-      cy.request("/api/movies/1").then((resposta) => {
+      cy.request("/api/movies/" + movieId).then((resposta) => {
         const userReviews = resposta.body.reviews.filter((filme) => {
           return filme.user.id = id
         })
@@ -103,8 +82,5 @@ describe('Validação de consultas de usuários comuns', () => {
         expect(userReviews[0].score).to.equal(1)
       })
     })
-
   })
-
-
 })
