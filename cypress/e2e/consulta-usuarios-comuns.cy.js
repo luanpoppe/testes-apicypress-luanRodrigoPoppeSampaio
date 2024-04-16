@@ -6,9 +6,9 @@ describe('Validação de consultas de usuários comuns', () => {
   let password
 
   before(() => {
-    cy.fixture("newUser.json").then((user) => {
-      email = user.email
+    cy.criarFaker().then((user) => {
       name = user.name
+      email = user.email
       password = user.password
 
       cy.criarUsuario(name, email, password).then((idRecebido) => {
@@ -19,22 +19,6 @@ describe('Validação de consultas de usuários comuns', () => {
         })
       })
     })
-
-
-  })
-
-  after(() => {
-    // Processo para apagar o usuário ao fim dos testes
-    cy.log("Deletar o usuário criado")
-    cy.request({
-      method: 'DELETE',
-      url: '/api/users/' + id,
-      auth: {
-        bearer: token
-      }
-
-    })
-
   })
 
   it("Consultar informações do usuário criado", () => {
@@ -134,11 +118,64 @@ describe('Validação de consultas de usuários comuns', () => {
     })
   })
 
-  // it("Permitir que um usuário possa inativar sua própria conta", () => {
-  //   cy.request("PATCH", "api/users/inactivate").then((resposta) => {
+  it("Permitir que um usuário possa inativar sua própria conta", () => {
+    cy.request({
+      method: 'PATCH',
+      url: 'api/users/inactivate',
+      auth: {
+        bearer: token
+      },
+    }).then((resposta) => {
+      expect(resposta.status).to.equal(204)
+    })
+  })
 
-  //   })
-  // })
+})
+
+describe('Validação de mudança de tipo de usuário', function () {
+  let id
+  let token
+  let email
+  let name
+  let password
+
+  beforeEach(() => {
+    cy.criarFaker().then((user) => {
+      name = user.name
+      email = user.email
+      password = user.password
+
+      cy.criarUsuario(name, email, password).then((idRecebido) => {
+        id = idRecebido
+      }).then(function () {
+        cy.logar(email, password).then((tokenRecebido) => {
+          token = tokenRecebido
+        })
+      })
+    })
+  })
+
+  it('Tornar o usuário comum em crítico sem critérios especiais', function () {
+    cy.request({
+      method: 'PATCH',
+      url: '/api/users/apply',
+      auth: {
+        bearer: token
+      }
+    }).then((resposta) => {
+      expect(resposta.status).to.equal(204)
+
+      cy.request({
+        method: 'GET',
+        url: '/api/users/' + id,
+        auth: {
+          bearer: token
+        },
+      }).then((resposta) => {
+        expect(resposta.body.type).to.equal(2)
+      })
+    })
+  })
 
   it("Permitir que usuário comum se torne admin sem passar por critérios especiais", () => {
     cy.request({
@@ -161,5 +198,4 @@ describe('Validação de consultas de usuários comuns', () => {
       })
     })
   })
-
 })
