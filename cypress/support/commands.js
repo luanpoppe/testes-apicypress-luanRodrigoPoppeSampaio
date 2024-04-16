@@ -1,3 +1,5 @@
+const { fakerPT_BR: faker } = require('@faker-js/faker');
+
 Cypress.Commands.add("criarUsuario", (name, email, password) => {
     const userCreated = {
         name: name,
@@ -34,6 +36,14 @@ Cypress.Commands.add("tornarAdminEDeletar", (id, token) => {
             }
         })
     })
+})
+
+Cypress.Commands.add("criarFaker", () => {
+    return {
+        name: faker.internet.userName(),
+        email: faker.internet.email(),
+        password: faker.internet.password(9)
+    }
 })
 
 // ***********************************************

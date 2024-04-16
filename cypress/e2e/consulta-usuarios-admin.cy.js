@@ -4,66 +4,50 @@ describe('Validação de consultas de usuários admins', () => {
   let email
   let name
   let password
+  let newToken
+
 
   before(() => {
-    cy.fixture("newUser.json").then((user) => {
-      email = user.email
-      name = user.name
-      password = user.password
-    }).then(() => {
-      // Processo para criar, logar e tornar o usuário admin antes dos testes
-      cy.log("Criar um usuário")
-      cy.request("POST", '/api/users', {
-        name: name,
-        email: email,
-        password: password
-      }).then((resposta) => {
-        id = resposta.body.id
-        email = resposta.body.email
-        name = resposta.body.name
-        cy.log("Logar com usuário criado")
-        cy.request("POST", "/api/auth/login", {
-          email: email,
-          password: "senha123"
-        }).then((resposta) => {
-          token = resposta.body.accessToken
+    cy.criarFaker()
+      // cy.fixture("newUser.json").then((user) => {
+      //   email = user.email
+      //   name = user.name
+      //   password = user.password
+      // })
+      .then((resposta) => {
+        email = resposta.email
+        name = resposta.name
+        password = resposta.password
+
+        // Processo para criar, logar e tornar o usuário admin antes dos testes
+        cy.log("Criar um usuário, logar e torná-lo admin")
+        cy.criarUsuario(name, email, password).then((idRecebido) => {
+          id = idRecebido
+        }).then(function () {
+          cy.logar(email, password).then((tokenRecebido) => {
+            token = tokenRecebido
+            cy.request({
+              method: 'PATCH',
+              url: '/api/users/admin/',
+              auth: {
+                bearer: token
+              }
+            })
+          })
         })
-      }).then((resposta) => {
-        cy.log("Tornar usuário criado admin")
-        cy.request({
-          method: 'PATCH',
-          url: 'https://raromdb-3c39614e42d4.herokuapp.com/api/users/admin/',
-          headers: {
-            Authorization: "Bearer " + token
-          }
-        })
+
       })
-    })
-
-  })
-
-  after(() => {
-    // Processo para apagar o usuário ao fim dos testes
-
-    cy.log("Deletar o usuário criado")
-    cy.request({
-      method: 'DELETE',
-      url: 'https://raromdb-3c39614e42d4.herokuapp.com/api/users/' + id,
-      headers: {
-        Authorization: "Bearer " + token
-      }
-    })
-
 
   })
 
   it("Permitir que usuário do tipo admin tenha permissão de ver informações de todos os usuário", () => {
+    cy.log(token)
     cy.request({
       method: "GET",
-      url: "https://raromdb-3c39614e42d4.herokuapp.com/api/users/",
-      headers: {
-        Authorization: "Bearer " + token
-      },
+      url: "/api/users/",
+      auth: {
+        bearer: token
+      }
     }).then((resposta) => {
       expect(resposta.status).to.equal(200)
       expect(resposta.body).to.be.a("array")
@@ -73,21 +57,21 @@ describe('Validação de consultas de usuários admins', () => {
   it("Permitir que usuário do tipo admin tenha permissão de deletar um usuário", () => {
     cy.request({
       method: "DELETE",
-      url: "https://raromdb-3c39614e42d4.herokuapp.com/api/users/" + (id - 1),
-      headers: {
-        Authorization: "Bearer " + token
-      },
+      url: "/api/users/" + (id - 1),
+      auth: {
+        bearer: token
+      }
     }).then((resposta) => {
       expect(resposta.status).to.equal(204)
     })
   })
 
-  it("Permitir que usuário do tipo comum tenha permissão de atualizar informações de outros usuários", () => {
+  it("Permitir que usuário do tipo admin tenha permissão de atualizar informações de outros usuários", () => {
     cy.request({
       method: "PUT",
-      url: "https://raromdb-3c39614e42d4.herokuapp.com/api/users/" + (id - 1),
-      headers: {
-        Authorization: "Bearer " + token
+      url: "/api/users/" + (id - 1),
+      auth: {
+        bearer: token
       },
       body: {
         name: "novoNome",
@@ -98,4 +82,40 @@ describe('Validação de consultas de usuários admins', () => {
     })
   })
 
+  it("Permitir que usuário do tipo admin possa inativar sua conta", () => {
+    cy.request({
+      method: "PATCH",
+      url: "/api/users/inactivate",
+      auth: {
+        bearer: token
+      },
+    }).then((resposta) => {
+      expect(resposta.status).to.equal(204)
+    })
+  })
+
+  it('Não deve ser permitido deletar a própria conta se o usuário estiver como inativo', () => {
+    cy.request({
+      method: 'DELETE',
+      url: '/api/users/' + id,
+      auth: {
+        bearer: token
+      },
+      failOnStatusCode: false
+    }).then((resposta) => {
+      expect(resposta.status).to.equal(401)
+    })
+  })
+
+  // it('Ao tentar cadastrar novamente com o mesmo usuário, tendo em vista que o usuário não foi deletado, deveria dar erro, mas não está dando', function () {
+  //   // Inativar um usuário na verdade está deletando o usuário
+  //   cy.request("POST", '/api/users', {
+  //     email: email,
+  //     name: name,
+  //     password: password,
+  //   }).then((resposta) => {
+  //     const typeOfStatus = resposta.status.toString().split("")[0]
+  //     expect(typeOfStatus).to.equal("4")
+  //   })
+  // })
 })
