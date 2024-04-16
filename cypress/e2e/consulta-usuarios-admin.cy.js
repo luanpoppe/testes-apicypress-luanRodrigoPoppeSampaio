@@ -1,4 +1,4 @@
-describe('Validação de consultas de usuários comuns', () => {
+describe('Validação de consultas de usuários admins', () => {
   let id
   let token
   let email

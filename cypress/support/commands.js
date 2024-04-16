@@ -21,16 +21,16 @@ Cypress.Commands.add("tornarAdminEDeletar", (id, token) => {
 
     return cy.request({
         method: 'PATCH',
-        url: 'https://raromdb-3c39614e42d4.herokuapp.com/api/users/admin/',
-        headers: {
-            Authorization: "Bearer " + token
+        url: '/api/users/admin/',
+        auth: {
+            bearer: token
         }
     }).then(() => {
         return cy.request({
             method: 'DELETE',
-            url: 'https://raromdb-3c39614e42d4.herokuapp.com/api/users/' + id,
-            headers: {
-                Authorization: "Bearer " + token
+            url: '/api/users/' + id,
+            auth: {
+                bearer: token
             }
         })
     })
