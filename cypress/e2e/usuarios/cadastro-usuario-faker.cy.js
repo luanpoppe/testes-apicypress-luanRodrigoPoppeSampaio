@@ -11,7 +11,6 @@ const userCreated = createRandomUser()
 
 describe('Validação de cadastro de usuários', () => {
   let id
-  let token
 
   it('Criar o usuário com valores válidos', () => {
     cy.request("POST", '/api/users', userCreated).then((resposta) => {

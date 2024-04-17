@@ -1,56 +1,56 @@
 const { fakerPT_BR: faker } = require('@faker-js/faker');
 
 Cypress.Commands.add("criarUsuario", (name, email, password) => {
-    const userCreated = {
-        name: name,
-        email: email,
-        password: password
-    }
+  const userCreated = {
+    name: name,
+    email: email,
+    password: password
+  }
 
-    return cy.request("POST", '/api/users', userCreated).its("body.id")
+  return cy.request("POST", '/api/users', userCreated).its("body.id")
 })
 
 Cypress.Commands.add("logar", (email, password) => {
-    const userCreated = {
-        email: email,
-        password: password
-    }
+  const userCreated = {
+    email: email,
+    password: password
+  }
 
-    return cy.request("POST", '/api/auth/login', userCreated).its("body.accessToken")
+  return cy.request("POST", '/api/auth/login', userCreated).its("body.accessToken")
 })
 
 Cypress.Commands.add("tornarAdminEDeletar", (id, token) => {
 
+  return cy.request({
+    method: 'PATCH',
+    url: '/api/users/admin/',
+    auth: {
+      bearer: token
+    }
+  }).then(() => {
     return cy.request({
-        method: 'PATCH',
-        url: '/api/users/admin/',
-        auth: {
-            bearer: token
-        }
-    }).then(() => {
-        return cy.request({
-            method: 'DELETE',
-            url: '/api/users/' + id,
-            auth: {
-                bearer: token
-            }
-        })
+      method: 'DELETE',
+      url: '/api/users/' + id,
+      auth: {
+        bearer: token
+      }
     })
+  })
 })
 
 Cypress.Commands.add("criarFaker", () => {
-    return {
-        name: faker.internet.userName(),
-        email: faker.internet.email(),
-        password: faker.internet.password(9)
-    }
+  return {
+    name: faker.internet.userName(),
+    email: faker.internet.email(),
+    password: faker.internet.password(9)
+  }
 })
 
 Cypress.Commands.add("getAllMovies", () => {
-    return cy.request({
-        method: 'GET',
-        url: '/api/movies',
-    }).its("body")
+  return cy.request({
+    method: 'GET',
+    url: '/api/movies',
+  }).its("body")
 })
 
 // ***********************************************
