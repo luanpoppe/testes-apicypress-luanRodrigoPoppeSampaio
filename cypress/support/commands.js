@@ -46,6 +46,13 @@ Cypress.Commands.add("criarFaker", () => {
     }
 })
 
+Cypress.Commands.add("getAllMovies", () => {
+    return cy.request({
+        method: 'GET',
+        url: '/api/movies',
+    }).its("body")
+})
+
 // ***********************************************
 // This example commands.js shows you how to
 // create various custom commands and overwrite
