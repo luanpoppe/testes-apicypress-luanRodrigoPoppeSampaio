@@ -24,19 +24,11 @@ describe("Usuário comun - Cadastro de filmes", function () {
   })
 
   it('Não permitir usuário comum cadastrar um filme', function () {
-    cy.request({
-      method: 'POST',
-      url: '/api/movies',
-      auth: {
-        bearer: token
-      },
-      body: movieInfos,
-      failOnStatusCode: false
-    }).then((resposta) => {
-      expect(resposta.status).to.equal(403)
-      expect(resposta.body.message).to.equal("Forbidden")
-
-    })
+    cy.req("POST", '/api/movies', movieInfos, token, false)
+      .then((resposta) => {
+        expect(resposta.status).to.equal(403)
+        expect(resposta.body.message).to.equal("Forbidden")
+      })
   })
 })
 
@@ -47,6 +39,7 @@ describe("Usuário admin - Cadastro de filmes", function () {
   let password
   let token
   let movieInfos
+
   before(function () {
     cy.fixture("newMovie.json").then((resposta) => {
       movieInfos = resposta
@@ -59,29 +52,17 @@ describe("Usuário admin - Cadastro de filmes", function () {
         id = idRecebido
         cy.logar(email, password).then((tokenRecebido) => {
           token = tokenRecebido
-          cy.request({
-            method: 'PATCH',
-            url: '/api/users/admin',
-            auth: {
-              bearer: token
-            },
-          })
+          cy.req("PATCH", "/api/users/admin", null, token)
         })
       })
     })
   })
 
   it('Cadastro de filme com valores válidos', function () {
-    cy.request({
-      method: 'POST',
-      url: '/api/movies',
-      auth: {
-        bearer: token
-      },
-      body: movieInfos,
-    }).then((resposta) => {
-      expect(resposta.status).to.equal(201)
-    })
+    cy.req("POST", "/api/movies", movieInfos, token)
+      .then((resposta) => {
+        expect(resposta.status).to.equal(201)
+      })
   })
 
   describe("Cadastro de filmes com valores inválidos", function () {
@@ -91,22 +72,24 @@ describe("Usuário admin - Cadastro de filmes", function () {
         title: null
       }
 
-      cy.request({
-        method: 'POST',
-        url: '/api/movies',
-        auth: {
-          bearer: token
-        },
-        body: invalidMovie,
-        failOnStatusCode: false
-      }).then((resposta) => {
-        expect(resposta.status).to.equal(400)
-        expect(resposta.body.message).to.deep.equal([
-          "title must be longer than or equal to 1 characters",
-          "title must be a string",
-          "title should not be empty"
-        ])
-      })
+      cy.req("POST", "/api/movies", invalidMovie, token, false)
+        // cy.request({
+        //   method: 'POST',
+        //   url: '/api/movies',
+        //   auth: {
+        //     bearer: token
+        //   },
+        //   body: invalidMovie,
+        //   failOnStatusCode: false
+        // })
+        .then((resposta) => {
+          expect(resposta.status).to.equal(400)
+          expect(resposta.body.message).to.deep.equal([
+            "title must be longer than or equal to 1 characters",
+            "title must be a string",
+            "title should not be empty"
+          ])
+        })
     })
 
     it('Gênero do filme inválido', function () {
@@ -114,22 +97,15 @@ describe("Usuário admin - Cadastro de filmes", function () {
         ...movieInfos,
         genre: null
       }
-      cy.request({
-        method: 'POST',
-        url: '/api/movies',
-        auth: {
-          bearer: token
-        },
-        body: invalidMovie,
-        failOnStatusCode: false
-      }).then((resposta) => {
-        expect(resposta.status).to.equal(400)
-        expect(resposta.body.message).to.deep.equal([
-          "genre must be longer than or equal to 1 characters",
-          "genre must be a string",
-          "genre should not be empty"
-        ])
-      })
+      cy.req("POST", '/api/movies', invalidMovie, token, false)
+        .then((resposta) => {
+          expect(resposta.status).to.equal(400)
+          expect(resposta.body.message).to.deep.equal([
+            "genre must be longer than or equal to 1 characters",
+            "genre must be a string",
+            "genre should not be empty"
+          ])
+        })
     })
 
     it('Descrição do filme inválido', function () {
@@ -138,22 +114,15 @@ describe("Usuário admin - Cadastro de filmes", function () {
         title: null
       }
 
-      cy.request({
-        method: 'POST',
-        url: '/api/movies',
-        auth: {
-          bearer: token
-        },
-        body: invalidMovie,
-        failOnStatusCode: false
-      }).then((resposta) => {
-        expect(resposta.status).to.equal(400)
-        expect(resposta.body.message).to.deep.equal([
-          "title must be longer than or equal to 1 characters",
-          "title must be a string",
-          "title should not be empty"
-        ])
-      })
+      cy.req("POST", "/api/movies", invalidMovie, token, false)
+        .then((resposta) => {
+          expect(resposta.status).to.equal(400)
+          expect(resposta.body.message).to.deep.equal([
+            "title must be longer than or equal to 1 characters",
+            "title must be a string",
+            "title should not be empty"
+          ])
+        })
     })
 
     it('Duração do filme inválido', function () {
@@ -162,21 +131,14 @@ describe("Usuário admin - Cadastro de filmes", function () {
         durationInMinutes: null
       }
 
-      cy.request({
-        method: 'POST',
-        url: '/api/movies',
-        auth: {
-          bearer: token
-        },
-        body: invalidMovie,
-        failOnStatusCode: false
-      }).then((resposta) => {
-        expect(resposta.status).to.equal(400)
-        expect(resposta.body.message).to.deep.equal([
-          "durationInMinutes must be a number conforming to the specified constraints",
-          "durationInMinutes should not be empty"
-        ])
-      })
+      cy.req("POST", '/api/movies', invalidMovie, token, false)
+        .then((resposta) => {
+          expect(resposta.status).to.equal(400)
+          expect(resposta.body.message).to.deep.equal([
+            "durationInMinutes must be a number conforming to the specified constraints",
+            "durationInMinutes should not be empty"
+          ])
+        })
     })
 
     it('Ano de lançamento do filme inválido', function () {
@@ -185,21 +147,14 @@ describe("Usuário admin - Cadastro de filmes", function () {
         releaseYear: null
       }
 
-      cy.request({
-        method: 'POST',
-        url: '/api/movies',
-        auth: {
-          bearer: token
-        },
-        body: invalidMovie,
-        failOnStatusCode: false
-      }).then((resposta) => {
-        expect(resposta.status).to.equal(400)
-        expect(resposta.body.message).to.deep.equal([
-          "releaseYear must be a number conforming to the specified constraints",
-          "releaseYear should not be empty"
-        ])
-      })
+      cy.req("POST", '/api/movies', invalidMovie, token, false)
+        .then((resposta) => {
+          expect(resposta.status).to.equal(400)
+          expect(resposta.body.message).to.deep.equal([
+            "releaseYear must be a number conforming to the specified constraints",
+            "releaseYear should not be empty"
+          ])
+        })
     })
   })
 
@@ -212,6 +167,7 @@ describe("Deleção de filme", function () {
   let password
   let token
   let movieInfos
+
   before(function () {
     cy.fixture("newMovie.json").then((resposta) => {
       movieInfos = resposta
@@ -233,40 +189,24 @@ describe("Deleção de filme", function () {
     cy.getAllMovies().then((todosFilmes) => {
       const lastMovie = todosFilmes[todosFilmes.length - 1]
 
-      cy.request({
-        method: 'DELETE',
-        url: '/api/movies/' + lastMovie.id,
-        auth: {
-          bearer: token
-        },
-        failOnStatusCode: false
-      }).then((resposta) => {
-        expect(resposta.status).to.equal(403)
-        expect(resposta.body.message).to.equal("Forbidden")
-      })
+      cy.req("DELETE", '/api/movies/' + lastMovie.id, null, token, false)
+        .then((resposta) => {
+          expect(resposta.status).to.equal(403)
+          expect(resposta.body.message).to.equal("Forbidden")
+        })
     })
   })
 
   it('Usuário admin - Pode realizar deleção de filme', function () {
     cy.getAllMovies().then((todosFilmes) => {
       const lastMovie = todosFilmes[todosFilmes.length - 1]
-      cy.request({
-        method: 'PATCH',
-        url: '/api/users/admin',
-        auth: {
-          bearer: token
-        },
-      }).then(() => {
-        cy.request({
-          method: 'DELETE',
-          url: '/api/movies/' + lastMovie.id,
-          auth: {
-            bearer: token
-          },
-        }).then((resposta) => {
-          expect(resposta.status).to.equal(204)
+      cy.req("PATCH", '/api/users/admin', null, token)
+        .then(() => {
+          cy.req("DELETE", '/api/movies/' + lastMovie.id, null, token)
+            .then((resposta) => {
+              expect(resposta.status).to.equal(204)
+            })
         })
-      })
     })
   })
 })
@@ -279,7 +219,7 @@ describe("Atualização de filme", function () {
   let token
   let movieInfos
   before(function () {
-    cy.fixture("newMovie.json").then((resposta) => {
+    cy.fixture("newMovie.json").then(function (resposta) {
       movieInfos = resposta
     })
     cy.criarFaker().then((user) => {
@@ -299,42 +239,24 @@ describe("Atualização de filme", function () {
     cy.getAllMovies().then((todosFilmes) => {
       const lastMovie = todosFilmes[todosFilmes.length - 1]
 
-      cy.request({
-        method: 'PUT',
-        url: '/api/movies/' + lastMovie.id,
-        auth: {
-          bearer: token
-        },
-        body: lastMovie,
-        failOnStatusCode: false
-      }).then((resposta) => {
-        expect(resposta.status).to.equal(403)
-        expect(resposta.body.message).to.equal("Forbidden")
-      })
+      cy.req("PUT", '/api/movies/' + lastMovie.id, lastMovie, token, false)
+        .then((resposta) => {
+          expect(resposta.status).to.equal(403)
+          expect(resposta.body.message).to.equal("Forbidden")
+        })
     })
   })
 
   it('Usuário admin - Pode realizar atualização de filme', function () {
     cy.getAllMovies().then((todosFilmes) => {
       const lastMovie = todosFilmes[todosFilmes.length - 1]
-      cy.request({
-        method: 'PATCH',
-        url: '/api/users/admin',
-        auth: {
-          bearer: token
-        },
-      }).then(() => {
-        cy.request({
-          method: 'PUT',
-          url: '/api/movies/' + lastMovie.id,
-          auth: {
-            bearer: token
-          },
-          body: lastMovie
-        }).then((resposta) => {
-          expect(resposta.status).to.equal(204)
+      cy.req("PATCH", '/api/users/admin', null, token)
+        .then(() => {
+          cy.req("PUT", '/api/movies/' + lastMovie.id, lastMovie, token)
+            .then((resposta) => {
+              expect(resposta.status).to.equal(204)
+            })
         })
-      })
     })
   })
 })

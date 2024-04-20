@@ -29,45 +29,32 @@ describe('Validação de cadastro de usuários', () => {
   })
 
   it("Não é possível logar com um email não existente", () => {
-    cy.request({
-      method: 'POST',
-      url: '/api/auth/login',
-      body: {
-        email: "emailNaoExistente@email.com",
-        password: password
-      },
-      failOnStatusCode: false
-    }).then((resposta) => {
-      expect(resposta.status).to.equal(401)
-      expect(resposta.body.message).to.equal("Invalid username or password.")
-      expect(resposta.body.accessToken).to.not.exist
-
-    })
+    const body = {
+      email: "emailNaoExistente@email.com",
+      password: password
+    }
+    cy.req("POST", "/api/auth/login", body, null, false)
+      .then((resposta) => {
+        expect(resposta.status).to.equal(401)
+        expect(resposta.body.message).to.equal("Invalid username or password.")
+        expect(resposta.body.accessToken).to.not.exist
+      })
   })
 
   it('Pessoa não logada não consegue acessar endpoints', () => {
-    cy.request({
-      method: 'GET',
-      url: '/api/users/' + id,
-      failOnStatusCode: false
-    }).then((resposta) => {
-      expect(resposta.status).to.equal(401)
-      expect(resposta.body.message).to.equal("Access denied.")
-    })
+    cy.req('GET', '/api/users/' + id, null, null, false)
+      .then((resposta) => {
+        expect(resposta.status).to.equal(401)
+        expect(resposta.body.message).to.equal("Access denied.")
+      })
   })
 
   it('Não é possível acessar endpoints com um accessToken errado', () => {
-    cy.request({
-      method: 'GET',
-      url: '/api/users/' + id,
-      headers: {
-        Authorization: "token falso"
-      },
-      failOnStatusCode: false
-    }).then((resposta) => {
-      expect(resposta.status).to.equal(401)
-      expect(resposta.body.message).to.equal("Access denied.")
-    })
+    cy.req('GET', '/api/users/' + id, null, "token falso", false)
+      .then((resposta) => {
+        expect(resposta.status).to.equal(401)
+        expect(resposta.body.message).to.equal("Access denied.")
+      })
   })
 
   it('É possível logar com novo usuário criado', () => {
@@ -82,15 +69,10 @@ describe('Validação de cadastro de usuários', () => {
   })
 
   it('Usuário criado tem permissão para funcionalidades de usuários comuns, como checar suas próprias informações', () => {
-    cy.request({
-      method: 'GET',
-      url: '/api/users/' + id,
-      auth: {
-        bearer: token
-      },
-    }).then((resposta) => {
-      expect(resposta.body.type).to.equal(0)
-      expect(resposta.status).to.equal(200)
-    })
+    cy.req("GET", '/api/users/' + id, null, token, null)
+      .then((resposta) => {
+        expect(resposta.body.type).to.equal(0)
+        expect(resposta.status).to.equal(200)
+      })
   })
 })
