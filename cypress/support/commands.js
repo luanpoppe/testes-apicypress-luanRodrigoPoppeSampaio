@@ -1,5 +1,24 @@
 const { fakerPT_BR: faker } = require('@faker-js/faker');
 
+Cypress.Commands.add("req", function (method, url, body = null, token = null, failOnStatusCode = true) {
+  const objectRequest = {
+    method: method,
+    url: url,
+    failOnStatusCode: failOnStatusCode
+  }
+
+  if (token) {
+    objectRequest.auth = {
+      bearer: token
+    }
+  }
+  if (body) {
+    objectRequest.body = body
+  }
+
+  return cy.request(objectRequest)
+})
+
 Cypress.Commands.add("criarUsuario", (name, email, password) => {
   const userCreated = {
     name: name,
