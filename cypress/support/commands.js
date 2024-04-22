@@ -38,6 +38,16 @@ Cypress.Commands.add("logar", (email, password) => {
   return cy.request("POST", '/api/auth/login', userCreated).its("body.accessToken")
 })
 
+Cypress.Commands.add("deletarUsuario", (id, token) => {
+  return cy.request({
+    method: 'DELETE',
+    url: '/api/users/' + id,
+    auth: {
+      bearer: token
+    }
+  })
+})
+
 Cypress.Commands.add("tornarAdminEDeletar", (id, token) => {
 
   return cy.request({
@@ -63,13 +73,6 @@ Cypress.Commands.add("criarFaker", () => {
     email: faker.internet.email(),
     password: faker.internet.password(9)
   }
-})
-
-Cypress.Commands.add("getAllMovies", () => {
-  return cy.request({
-    method: 'GET',
-    url: '/api/movies',
-  }).its("body")
 })
 
 // ***********************************************
