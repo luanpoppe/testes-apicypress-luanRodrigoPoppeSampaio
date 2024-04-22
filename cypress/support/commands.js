@@ -38,6 +38,16 @@ Cypress.Commands.add("logar", (email, password) => {
   return cy.request("POST", '/api/auth/login', userCreated).its("body.accessToken")
 })
 
+Cypress.Commands.add("tornarAdmin", (token) => {
+  return cy.request({
+    method: 'PATCH',
+    url: '/api/users/admin/',
+    auth: {
+      bearer: token
+    }
+  })
+})
+
 Cypress.Commands.add("deletarUsuario", (id, token) => {
   return cy.request({
     method: 'DELETE',

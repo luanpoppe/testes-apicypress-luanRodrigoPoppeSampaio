@@ -1,5 +1,3 @@
-const { fakerPT_BR: faker } = require('@faker-js/faker');
-
 describe("Usuário comun - Cadastro de filmes", function () {
   let id
   let name
