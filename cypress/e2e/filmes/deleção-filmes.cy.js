@@ -111,7 +111,6 @@ describe("Deleção de filme", function () {
         })
     })
 
-
     it('Checar informações do filme deletado não aparecen mais:', function () {
       cy.req("GET", "/api/movies/" + movieInfosResponse.id, null, null).then((resposta) => {
         expect(resposta.status).to.equal(200)

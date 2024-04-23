@@ -104,5 +104,11 @@ describe("Pessoa não logada pode acessar informações sobre filmes", () => {
           })
         })
     })
+
+    it('deve dar erro ao não passar os quryParameters', () => {
+      cy.req("GET", "/api/movies/search", null, null, false).then((resposta) => {
+        expect(resposta.status).to.equal(500)
+      })
+    })
   })
 })
