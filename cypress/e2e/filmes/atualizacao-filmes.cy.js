@@ -5,21 +5,21 @@ describe("Atualização de filme", function () {
   before(function () {
     cy.fixture("updateMovie.json").then(function (resposta) {
       movieInfosFixture = resposta
-    })
-    cy.criarFaker().then((userTemporario) => {
-      cy.criarUsuario(userTemporario.name, userTemporario.email, userTemporario.password)
-        .then((idRecebido) => {
-          const idTemporario = idRecebido
-          cy.logar(userTemporario.email, userTemporario.password).then((tokenRecebido) => {
-            const tokenTemporario = tokenRecebido
-            cy.tornarAdmin(tokenTemporario).then(() => {
-              cy.createMovie(movieInfosFixture, tokenTemporario).then((resposta) => {
-                movieInfosResponse = resposta.body
-                cy.deletarUsuario(idTemporario, tokenTemporario)
+      cy.criarFaker().then((userTemporario) => {
+        cy.criarUsuario(userTemporario.name, userTemporario.email, userTemporario.password)
+          .then((idRecebido) => {
+            const idTemporario = idRecebido
+            cy.logar(userTemporario.email, userTemporario.password).then((tokenRecebido) => {
+              const tokenTemporario = tokenRecebido
+              cy.tornarAdmin(tokenTemporario).then(() => {
+                cy.createMovie(movieInfosFixture, tokenTemporario).then((resposta) => {
+                  movieInfosResponse = resposta.body
+                  cy.deletarUsuario(idTemporario, tokenTemporario)
+                })
               })
             })
           })
-        })
+      })
     })
   })
 
@@ -54,7 +54,7 @@ describe("Atualização de filme", function () {
     })
   })
 
-  describe.only("Usuário admin", function () {
+  describe("Usuário admin", function () {
     let idUsuarioAdmin
     let tokenUsuarioAdmin
 
