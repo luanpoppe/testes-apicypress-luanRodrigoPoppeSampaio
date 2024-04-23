@@ -283,7 +283,7 @@ describe('Validação de consultas de usuários comuns', () => {
     })
   })
 
-  describe.only("Checar as reviews de um usuário", function () {
+  describe("Checar as reviews de um usuário", function () {
     const segundoFilme = { fixture: "", response: "" }
     before(function () {
       cy.log("Criando um segundo filme")
